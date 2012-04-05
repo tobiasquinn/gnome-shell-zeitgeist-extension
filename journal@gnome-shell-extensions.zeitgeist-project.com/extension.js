@@ -36,15 +36,19 @@ const _ = Gettext.gettext;
 const C_ = Gettext.pgettext;
 const Tp = imports.gi.TelepathyGLib;
 
-const Extension = imports.ui.extensionSystem.extensions["journal@gnome-shell-extensions.zeitgeist-project.com"];
+//const Extension = imports.ui.extensionSystem.extensions["journal@gnome-shell-extensions.zeitgeist-project.com"];
+const Extension = imports.misc.extensionUtils.getCurrentExtension();
 
 const IconGrid = imports.ui.iconGrid;
 const PopupMenu = imports.ui.popupMenu;
 const Main = imports.ui.main;
 const Util = imports.misc.util;
-const DocInfo = Extension.docInfo;
-const Semantic = Extension.semantic;
-const Zeitgeist = Extension.zeitgeist;
+//const DocInfo = Extension.docInfo;
+//const Semantic = Extension.semantic;
+//const Zeitgeist = Extension.zeitgeist;
+const DocInfo = Extension.imports.docInfo;
+const Semantic = Extension.imports.semantic;
+const Zeitgeist = Extension.imports.zeitgeist;
 const ViewSelector = imports.ui.viewSelector;
 
 
@@ -122,7 +126,8 @@ EventItem.prototype = {
                                               })
                                             });
 
-        this.actor = new St.Group ({ reactive: true});
+        //this.actor = new St.Group ({ reactive: true});
+        this.actor = new St.BoxLayout ({ reactive: true});
         this.actor.connect('enter-event', Lang.bind(this, this._onEnter));
         this.actor.connect('leave-event', Lang.bind(this, this._onLeave)); 
 
@@ -132,6 +137,7 @@ EventItem.prototype = {
                                         button_mask: St.ButtonMask.ONE | St.ButtonMask.THREE, // assume button 2 (middle) does nothing
                                         x_fill: true,
                                         y_fill: true });
+        // FIXME: this is it???
         this._button.set_child (this._icon.actor);
         this._button.connect ('clicked', Lang.bind(this, this._onButtonPress));
 
@@ -975,11 +981,13 @@ JournalLayout.prototype = {
 
     clear: function () {
         this._items = [];
+        global.log("clear");
         for (var key in this._containers)
         {
-            this._containers[key].actor.destroy_children();
+            global.log(key);
+//            this._containers[key].actor.destroy_children();
             this._containers[key].actor.destroy();
-            this.actor.destroy_children();
+//            this.actor.destroy_children();
         }
     },
 };
@@ -1416,7 +1424,7 @@ let tabIndex;
 
 function init(metadata)
 {
-    imports.gettext.bindtextdomain('gnome-shell-extensions', metadata.localedir);
+//    imports.gettext.bindtextdomain('gnome-shell-extensions', metadata.localedir);
 }
 
 function enable() {

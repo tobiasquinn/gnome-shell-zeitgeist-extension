@@ -4,6 +4,8 @@ const Gio = imports.gi.Gio;
 const St = imports.gi.St;
 const Search = imports.ui.search;
 
+const GdkPixbuf = imports.gi.GdkPixbuf;
+
 function ZeitgeistItemInfo(event) {
     this._init(event);
 }
@@ -23,8 +25,21 @@ ZeitgeistItemInfo.prototype = {
     },
 
     createIcon : function(size) {
-        let x = St.TextureCache.get_default().load_thumbnail(size, this.uri, this.subject.mimetype);
+        // this needs to use gnome-desktop for its interface...?? as this function has been removed from gnome-shell
+//        global.log(size);
+//        global.log(this.uri);
+//        global.log(this.subject.mimetype);
+//        let pb = GdkPixbuf.Pixbuf.new_from_file_at_size("/home/tobias/giggle.svg", size, size);
+//        return pb;
+        //let x = St.TextureCache.get_default();//.load_thumbnail(size, this.uri, this.subject.mimetype);
+        //let x = St.TextureCache.get_default().load_file_to_cogl_texture("/home/tobias/giggle.svg");//.load_thumbnail(size, this.uri, this.subject.mimetype);
+        //let x = St.TextureCache.get_default().load_uri_async(this.uri, size, size);
+        let x = St.TextureCache.get_default().load_uri_async("file:///home/tobias/giggle.svg", size, size);
         return x;
+
+        //return pb;
+//        let x = St.TextureCache.get_default().load_thumbnail(size, this.uri, this.subject.mimetype);
+//        return x;
         // FIXME: We should consider caching icons
     },
 
