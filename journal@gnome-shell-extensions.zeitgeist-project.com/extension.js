@@ -981,10 +981,10 @@ JournalLayout.prototype = {
 
     clear: function () {
         this._items = [];
-        global.log("clear");
+//        global.log("clear");
         for (var key in this._containers)
         {
-            global.log(key);
+//            global.log(key);
 //            this._containers[key].actor.destroy_children();
             this._containers[key].actor.destroy();
 //            this.actor.destroy_children();

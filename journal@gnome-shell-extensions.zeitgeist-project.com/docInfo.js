@@ -3,8 +3,10 @@
 const Gio = imports.gi.Gio;
 const St = imports.gi.St;
 const Search = imports.ui.search;
+const GtkClutter = imports.gi.GtkClutter;
 
 const GdkPixbuf = imports.gi.GdkPixbuf;
+const GnomeDesktop = imports.gi.GnomeDesktop;
 
 function ZeitgeistItemInfo(event) {
     this._init(event);
@@ -34,13 +36,45 @@ ZeitgeistItemInfo.prototype = {
         //let x = St.TextureCache.get_default();//.load_thumbnail(size, this.uri, this.subject.mimetype);
         //let x = St.TextureCache.get_default().load_file_to_cogl_texture("/home/tobias/giggle.svg");//.load_thumbnail(size, this.uri, this.subject.mimetype);
         //let x = St.TextureCache.get_default().load_uri_async(this.uri, size, size);
-        let x = St.TextureCache.get_default().load_uri_async("file:///home/tobias/giggle.svg", size, size);
-        return x;
-
-        //return pb;
-//        let x = St.TextureCache.get_default().load_thumbnail(size, this.uri, this.subject.mimetype);
+//        let x = St.TextureCache.get_default().load_uri_async("file:///home/tobias/giggle.svg", size, size);
 //        return x;
-        // FIXME: We should consider caching icons
+        let thumbFactory = GnomeDesktop.DesktopThumbnailFactory.new(GnomeDesktop.DesktopThumbnailSize.LARGE);
+        // attempt to copy gnome-shell stuff
+        //    print(dump(thumbFactory));
+        // this needs to find the mtime correctly
+        var file = Gio.File.new_for_uri(this.uri);
+        var file_info = file.query_info(Gio.FILE_ATTRIBUTE_TIME_MODIFIED, 0, null);// Gio.FileQueryInfoFlags.none, null));
+        var mtime = file_info.get_modification_time();
+
+        let generated_thumbnail = St.TextureCache.get_default().load_uri_async("file:///home/tobias/giggle.svg", size, size);
+        existing_thumbnail = thumbFactory.lookup(this.uri, mtime);
+        //global.log(existing_thumbnail);
+        if (existing_thumbnail != null) {
+            global.log("existing");
+            //global.log(existing_thumbnail);
+        } else if (thumbFactory.has_valid_failed_thumbnail(this.uri, mtime)) {
+            global.log("Has failed thumbnail");
+        } else if (thumbFactory.can_thumbnail(this.uri, this.mimeType, mtime)) {
+            global.log(this.uri);
+            global.log(this.mimeType);
+            igenerated_thumbnail = thumbFactory.generate_thumbnail(this.uri, this.mimeType);
+            global.log("GEN");
+            global.log(igenerated_thumbnail);
+            if (igenerated_thumbnail) {
+                global.log("Generated thumbnail success");
+                var texture = new GtkClutter.Texture();
+                texture.set_from_pixbuf(igenerated_thumbnail);
+                generated_thumbnail = texture;
+            } else {
+                global.log("Generated thumbnail fail");
+            }
+        } else {
+            global.log("No thumbnail");
+        }
+
+        global.log("returning");
+        global.log(generated_thumbnail);
+        return generated_thumbnail;
     },
 
     launch : function() {
